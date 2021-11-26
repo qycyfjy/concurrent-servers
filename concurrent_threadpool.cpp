@@ -1,4 +1,19 @@
+#include <arpa/inet.h>
+#include <errno.h>
+#include <netinet/in.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
 #include "ThreadPool.h"
+#include "absl/status/status.h"
+#include "absl/status/statusor.h"
+#include "absl/strings/string_view.h"
+#include "fmt/ostream.h"
+#include "fmt/printf.h"
 #include "helpers.h"
 
 constexpr int MAX_BUF = 1024;
@@ -32,6 +47,7 @@ int main() {
             fmt::print(stderr, "{}\n", status.ToString());
           }
           fmt::printf("peer done\n");
+          close(cfd);
         },
         std::move(client_fd));
   }
@@ -65,7 +81,6 @@ absl::Status serve(int client_fd) {
           else {
             buf[i] += 1;
             if (send(client_fd, &buf[i], 1, 0) < 1) {
-              close(client_fd);
               return absl::UnknownError(strerror(errno));
             }
           }
@@ -74,6 +89,5 @@ absl::Status serve(int client_fd) {
       }
     }
   }
-  close(client_fd);
   return absl::OkStatus();
 }

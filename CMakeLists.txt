@@ -16,3 +16,9 @@ target_link_libraries(concurrent_thread PRIVATE fmt::fmt absl::status absl::stat
 
 add_executable(concurrent_threadpool concurrent_threadpool.cpp helpers.h helpers.cpp ThreadPool.h)
 target_link_libraries(concurrent_threadpool PRIVATE fmt::fmt absl::status absl::statusor absl::synchronization)
+
+add_executable(event_driven concurrent_epoll.cpp helpers.h helpers.cpp)
+target_link_libraries(event_driven PRIVATE fmt::fmt absl::status absl::statusor)
+
+add_executable(uv_server concurrent_uv.cpp helpers.h helpers.cpp)
+target_link_libraries(uv_server PRIVATE fmt::fmt absl::status absl::statusor unofficial::libuv::libuv)

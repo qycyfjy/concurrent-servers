@@ -18,13 +18,17 @@ class Receiver(threading.Thread):
             buf = self.sock_fd.recv(self.bufsize)
             logging.info(f'{self.name} recv {buf} from remote')
             received += buf
-            if b'11111' in received:
+            if b'1' in received:
                 break
 
 
 def make_new_worker(name, ip, port):
     sock_fd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock_fd.connect((ip, port))
+    try:
+        sock_fd.connect((ip, port))
+    except :
+        print('socket error')
+        return
     if sock_fd.recv(1) != b'*':
         logging.error('cannot receive * from remote')
     logging.info(f'{name} connected')

@@ -46,6 +46,7 @@ int main() {
         fmt::print(stderr, "{}\n", status.ToString());
       }
       fmt::printf("peer done\n");
+      close(client_fd);
     });
   }
   return 0;
@@ -78,7 +79,6 @@ absl::Status serve(int client_fd) {
           else {
             buf[i] += 1;
             if (send(client_fd, &buf[i], 1, 0) < 1) {
-              close(client_fd);
               return absl::UnknownError(strerror(errno));
             }
           }
@@ -87,6 +87,5 @@ absl::Status serve(int client_fd) {
       }
     }
   }
-  close(client_fd);
   return absl::OkStatus();
 }

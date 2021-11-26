@@ -1,5 +1,22 @@
 #include "helpers.h"
 
+#include <arpa/inet.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <netinet/in.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
+#include "absl/status/status.h"
+#include "absl/status/statusor.h"
+#include "absl/strings/string_view.h"
+#include "fmt/ostream.h"
+#include "fmt/printf.h"
+
 static absl::StatusOr<int> tcp_server(fmt::string_view addr, uint16_t port) {
   int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (listen_fd < 0) {
@@ -37,4 +54,15 @@ void report_connection(const sockaddr_in &peer) {
   char peer_addr_p[INET_ADDRSTRLEN] = {0};
   inet_ntop(AF_INET, &peer.sin_addr, peer_addr_p, INET_ADDRSTRLEN);
   fmt::printf("connection from %s:%d\n", peer_addr_p, ntohs(peer.sin_port));
+}
+
+void set_nonblock(int fd) {
+  int flags = fcntl(fd, F_GETFL, 0);
+  if (flags == -1) {
+    exit(-1);
+  }
+
+  if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1) {
+    exit(-1);
+  }
 }
